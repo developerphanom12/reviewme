@@ -15,7 +15,7 @@ module.exports = {
        
         EMPLOYER_LOGIN_SUCCESS: {
             message: " EMPLOYER LOGIN SUCCESSFULLY",
-            status: 200
+            status: 201
         },
 
         
