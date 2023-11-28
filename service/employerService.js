@@ -63,12 +63,12 @@ function employlogin(email, password, callback) {
   
       return callback(null, {
         data: {
-          user: {
+         
             id: user.id,
             email: user.email,
             role: user.role,
             token: token,
-          }
+          
         }
       });
     });
