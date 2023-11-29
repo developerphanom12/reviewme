@@ -21,7 +21,7 @@ app.use(cors({ origin: true }));
 app.use('/api/employer',employeroutes)
 
 
-app.use('/api/employer',employroutes)
+app.use('/api/employ',employroutes)
 
 
 
