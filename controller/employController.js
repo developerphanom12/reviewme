@@ -4,7 +4,7 @@ const messages = require('../constants/message')
 
 
 
-const registeremployer = async (req, res) => {
+const registeremploy = async (req, res) => {
     const { email, password, phone_number} = req.body;
   
     try {
@@ -70,6 +70,6 @@ const employlogin = async(req,res) => {
 
 
 module.exports = {
-    registeremployer,
+    registeremploy,
     employlogin
 }

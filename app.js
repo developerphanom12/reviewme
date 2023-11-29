@@ -5,6 +5,7 @@ const path = require('path');
 const cors = require('cors');
 const helmet = require('helmet');
 const employeroutes = require('./routes/employer')
+const employroutes = require('./routes/employ')
 dotenv.config();
 
 
@@ -20,6 +21,7 @@ app.use(cors({ origin: true }));
 app.use('/api/employer',employeroutes)
 
 
+app.use('/api/employer',employroutes)
 
 
 
