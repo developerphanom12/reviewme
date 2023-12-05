@@ -5,7 +5,7 @@ const path = require('path');
 const cors = require('cors');
 const helmet = require('helmet');
 const employeroutes = require('./routes/employer')
-const employroutes = require('./routes/employ')
+const employroutes = require('./routes/employroutes')
 dotenv.config();
 
 
@@ -32,7 +32,7 @@ app.use((err, req, res, next) => {
 
 
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3500;
 const ipAddress = '127.0.0.1';
 
 // Serve static files

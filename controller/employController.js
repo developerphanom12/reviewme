@@ -5,21 +5,24 @@ const messages = require('../constants/message')
 
 
 const registeremploy = async (req, res) => {
-    const { email, password, phone_number} = req.body;
+    const { email, password, phone_number,first_name,last_name,gender} = req.body;
   
     try {
         
-      const existingUser = await employerservice.getEmployByName(email,phone_number);
+      const existingUser = await employerservice.getEmployByName(email,phone_number,);
       if (existingUser) {
         return res.status(400).json({ error: 'check your email or phonenumber is already register.' });
       }
   
       const hashedPassword = await bcrypt.hash(password, 10);
   
-      const userId = await employerservice.insertEmployer(
+      const userId = await employerservice.insertEmploy(
         email,
         hashedPassword,
         phone_number,
+        first_name,
+        last_name,
+        gender
       );
   
       res.status(messages.EMPLOYER.EMPLOYER_CREATE.status).json({
@@ -69,7 +72,51 @@ const employlogin = async(req,res) => {
 
 
 
+
+const updateemployeeducation = async (req, res) => {
+  const userId = req.user.id;
+  const userRole = req.user.role;
+console.log("userid and userrole", userId,userRole)
+  try {
+      if (userRole === 'employ') {
+        const { employe_id,school, degree, 	start_date,end_date, grade ,typeof_grade} = req.body;
+          const updateemploye = await employerservice.updateeducation(userId, {
+           employe_id: userId,
+            school,
+            degree,
+            start_date,
+            end_date,
+            grade,
+            typeof_grade
+          }).catch((error) => {
+              return res.status(400).json({ error: error.message });
+          });
+
+          if (!updateemploye) {
+              return res.status(400).json({ error: "employ not found" });
+          }
+
+          res.status(200).json({
+              message: "employe education data add",
+              status:200
+          });
+      }else{
+        res.status(400).json({
+          status:400,
+          messages : "forbidden for regular user"
+        })
+      }
+  } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+
+
+
 module.exports = {
     registeremploy,
-    employlogin
+    employlogin,
+    updateemployeeducation
 }
