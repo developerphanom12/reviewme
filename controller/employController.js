@@ -114,9 +114,92 @@ console.log("userid and userrole", userId,userRole)
 
 
 
+const updatemployeCmpanydetails = async (req, res) => {
+  const userId = req.user.id;
+  const userRole = req.user.role;
+console.log("userid and userrole", userId,userRole)
+  try {
+      if (userRole === 'employ') {
+        const { employe_id, title, employment_type, company_name, location, location_type, exprience,start_date,end_date,description } = req.body;
+        const updateemploye = await employerservice.updatecompanydetails(userId, {
+           employe_id: userId,
+           title,
+           employment_type,
+           company_name,
+           location,
+           location_type,
+           exprience,
+            start_date,
+            end_date,
+           description
+          }).catch((error) => {
+              return res.status(400).json({ error: error.message });
+          });
+
+          if (!updateemploye) {
+              return res.status(400).json({ error: "employ not found" });
+          }
+
+          res.status(200).json({
+              message: "employe company data add",
+              status:200
+          });
+      }else{
+        res.status(400).json({
+          status:400,
+          messages : "forbidden for regular user"
+        })
+      }
+  } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+
+
+
+
+const updatemployeSKilldetails = async (req, res) => {
+  const userId = req.user.id;
+  const userRole = req.user.role;
+console.log("userid and userrole", userId,userRole)
+  try {
+      if (userRole === 'employ') {
+        const { employe_id, skills} = req.body;
+        const updateemploye = await employerservice.updateskillsdetails(userId, {
+           employe_id: userId,
+           skills,
+         
+          }).catch((error) => {
+              return res.status(400).json({ error: error.message });
+          });
+
+          if (!updateemploye) {
+              return res.status(400).json({ error: "employ not found" });
+          }
+
+          res.status(200).json({
+              message: "employe company data add",
+              status:200
+          });
+      }else{
+        res.status(400).json({
+          status:400,
+          messages : "forbidden for regular user"
+        })
+      }
+  } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
 
 module.exports = {
     registeremploy,
     employlogin,
-    updateemployeeducation
+    updateemployeeducation,
+    updatemployeCmpanydetails,
+    updatemployeSKilldetails
 }

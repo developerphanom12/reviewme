@@ -81,7 +81,6 @@ function updateeducation(userId, updatemploye) {
   return new Promise((resolve, reject) => {
     const { employe_id, school, degree, start_date, end_date, grade, typeof_grade } = updatemploye;
 
-    // Construct the SQL query
     const query = `
         INSERT INTO  employe_education_table (employe_id,
           school,degree,
@@ -127,9 +126,108 @@ function updateeducation(userId, updatemploye) {
 }
 
 
+function updatecompanydetails(userId, updatemploye) {
+  return new Promise((resolve, reject) => {
+    const { employe_id, title, employment_type, company_name, location, location_type, exprience, start_date, end_date, description } = updatemploye;
+
+    const query = `
+        INSERT INTO  employe_company_details (employe_id,
+          title,employment_type,
+           company_name,
+           location,
+           location_type,
+           exprience,
+           start_date,
+           end_date,
+           description
+           ) VALUES (?,?, ?, ?,?,?,?,?,?,?)
+      `;
+
+
+    db.query(query, [userId, title, employment_type, company_name, location, location_type, exprience, start_date, end_date, description], (error, result) => {
+      if (error) {
+        reject(error);
+        console.log('Error updating employeee:', error);
+      } else {
+        if (result.affectedRows > 0) {
+
+          const fetchQuery = `
+              SELECT * FROM employe_company_details WHERE employe_id = ?;
+            `;
+
+          db.query(fetchQuery, [userId], (fetchError, fetchResult) => {
+            if (fetchError) {
+              reject(fetchError);
+              logger.error('Error fetching updated employeee:', fetchError);
+            } else {
+              if (fetchResult.length > 0) {
+                const updatyemployee = fetchResult[0];
+                resolve(updatyemployee);
+                console.log('employeee updated successfully', updatyemployee);
+              } else {
+                resolve(null);
+              }
+            }
+          });
+        } else {
+          resolve(null);
+        }
+      }
+    });
+  });
+}
+
+function updateskillsdetails(userId, updatemploye) {
+  return new Promise((resolve, reject) => {
+    const { employe_id, skills } = updatemploye;
+
+    const query = `
+    INSERT INTO employe_skills_details (employe_id, skills)
+    VALUES ${skills.map(skill => '(?, ?)').join(', ')}
+`;
+
+    const queryParams = skills.reduce((params, skill) => {
+      params.push(userId, skill);
+      return params;
+    }, []);
+
+    db.query(query, queryParams, (error, result) => {
+      if (error) {
+        reject(error);
+        console.log('Error updating employee:', error);
+      } else {
+        if (result.affectedRows > 0) {
+
+          const fetchQuery = `
+              SELECT * FROM employe_skills_details WHERE employe_id = ?;
+            `;
+
+          db.query(fetchQuery, [userId], (fetchError, fetchResult) => {
+            if (fetchError) {
+              reject(fetchError);
+              logger.error('Error fetching updated employeee:', fetchError);
+            } else {
+              if (fetchResult.length > 0) {
+                const updatyemployee = fetchResult[0];
+                resolve(updatyemployee);
+                console.log('employeee updated successfully', updatyemployee);
+              } else {
+                resolve(null);
+              }
+            }
+          });
+        } else {
+          resolve(null);
+        }
+      }
+    });
+  });
+}
 module.exports = {
   getEmployByName,
   insertEmploy,
   employlogin,
   updateeducation,
+  updatecompanydetails,
+  updateskillsdetails
 };

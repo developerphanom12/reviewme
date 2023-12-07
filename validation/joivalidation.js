@@ -40,14 +40,14 @@ const validateeducation = (req,res,next) =>{
 
 const employCOmpanyDetails = Joi.object({
   title : Joi.string().required(),
-  employment_type : Joi.string().valid('fulltime','part_time','self_employe', 'freelance','internship', 'traineee'),
+  employment_type : Joi.string().valid('fulltime','part_time','self_employe', 'freelance','internship', 'traineee').required(),
   company_name : Joi.string().required(),
   location : Joi.string().required(),
   location_type : Joi.string().valid('on_site','hybrid', 'remote').required(),
   exprience	: Joi.string().valid('yes', 'no').required(),
   start_date : Joi.date().required(),
   end_date : Joi.date().optional(),
-  descriptiobn : Joi.string().optional()
+  description : Joi.string().optional()
 })
 
 
@@ -81,8 +81,26 @@ const validateEmployersdata = (req, res, next) => {
 
 
 
+const employskilldetails = Joi.object({
+  skills: Joi.array().items(Joi.string()).required(),
+
+})
+
+
+const employSkilldetails = (req, res, next) => {
+
+  const { error } = employskilldetails.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({ error: error.details[0].message });
+  }
+
+  next();
+};
+
 module.exports = {
     validateEmployersdata,
     validateeducation,
-    employcompanydetails
+    employcompanydetails,
+    employSkilldetails
 }

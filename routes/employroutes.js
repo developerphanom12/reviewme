@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const employer = require('../controller/employController');
-const { validateEmployersdata, validateeducation } = require("../validation/joivalidation");
+const { validateEmployersdata, validateeducation, employcompanydetails, employSkilldetails } = require("../validation/joivalidation");
 const authenticateToken = require("../authentication/token");
 
 
@@ -15,9 +15,10 @@ router.post('/login',employer.employlogin);
 router.post('/addeducationdates',authenticateToken, validateeducation ,employer.updateemployeeducation);
 
 //--- add skills --- ///
-router.post('/addskills', authenticateToken, validateeducation, employer.employlogin)
 
 
+router.post('/addcompexpreince', authenticateToken, employcompanydetails, employer.updatemployeCmpanydetails)
 
+router.post('/addcompanydetails', authenticateToken, employSkilldetails, employer.updatemployeSKilldetails)
 
 module.exports =router
