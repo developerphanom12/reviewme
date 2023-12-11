@@ -196,10 +196,39 @@ console.log("userid and userrole", userId,userRole)
 };
 
 
+
+
+const getbyid = async (req, res) => {
+
+  try {
+    const { userId } = req.params;
+
+    if (!userId) {
+      return res.status(400).json({ error: 'employ id provide please.' });
+    }
+    const userApplications = await employerservice.getemployedetail(userId);
+
+    if (userApplications.length === 0) {
+      return res.status(404).json({ status: 404, message: 'employ not found' });
+    }
+
+    res.status(201).json({
+      message: 'data feth succesffully with employ id ',
+      status: 201,
+      data: userApplications,
+    });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+
 module.exports = {
     registeremploy,
     employlogin,
     updateemployeeducation,
     updatemployeCmpanydetails,
-    updatemployeSKilldetails
+    updatemployeSKilldetails,
+    getbyid
 }

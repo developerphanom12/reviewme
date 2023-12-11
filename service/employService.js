@@ -223,11 +223,101 @@ function updateskillsdetails(userId, updatemploye) {
     });
   });
 }
+
+
+
+function getemployedetail(userId) {
+  return new Promise((resolve, reject) => {
+      const query = `
+      SELECT 
+          c.id,
+          c.first_name,
+          c.last_name,
+          c.phone_number,
+          c.email,
+          c.gender,
+          a.education_id,
+          a.employe_id AS id,
+          a.school,
+          a.degree,
+          a.start_date,
+          a.end_date,
+          a.grade,
+          a.typeof_grade,
+          u.employe_id AS id,
+          u.title,
+          u.employment_type,
+          u.location,
+          u.location_type,
+          u.exprience,
+          u.start_date,
+          u.end_date,
+          u.description
+      FROM employe_register c
+      LEFT JOIN employe_company_details u ON c.id = u.employe_id
+      LEFT JOIN employe_education_table a ON c.id = a.employe_id
+      WHERE c.id = ?;`;
+
+      db.query(query, [userId], (error, results) => {
+          if (error) {
+              console.error('Error executing query:', error);
+              reject(error);
+              console.error('Error getting employe by ID:', error);
+          } else {
+              if (results.length === 0) {
+                  reject(new Error('employe not found'));
+              } else {
+                  const employe = {};
+                  results.forEach((row) => {
+                      if (!employe[row.id]) {
+                        employe[row.id] = {
+                              id: row.id,
+                              first_name: row.first_name,
+                              last_name: row.last_name,
+                              phone_number: row.phone_number,
+                              email: row.email,
+                              gender: row.gender,
+                              company: {
+                                  company_id: row.company_id,
+                                  employment_type: row.employment_type,
+                                  location: row.location,
+                                  location_type: row.location_type,
+                                  exprience: row.exprience,
+                                  start_date : row.start_date,
+                                  end_date: row.end_date,
+                                  description : row.description
+                              },
+                              education : {
+                                education_id: row.education_id,
+                                school : row.school,
+                                degree : row.degree,
+                                start_date : row.start_date,
+                                end_date : row.end_date,
+                                grade : row.grade,
+                                typeof_grade : row.typeof_grade
+                              }
+            
+                          };
+                      }
+
+                     
+                  });
+
+                  resolve(Object.values(employe));
+                  console.log('employe retrieved by ID successfully');
+              }
+          }
+      });
+  });
+}
+
+
 module.exports = {
   getEmployByName,
   insertEmploy,
   employlogin,
   updateeducation,
   updatecompanydetails,
-  updateskillsdetails
+  updateskillsdetails,
+  getemployedetail
 };

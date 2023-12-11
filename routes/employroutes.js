@@ -21,4 +21,5 @@ router.post('/addcompexpreince', authenticateToken, employcompanydetails, employ
 
 router.post('/addcompanydetails', authenticateToken, employSkilldetails, employer.updatemployeSKilldetails)
 
+router.get('/getdetailprofile/:userId', authenticateToken, employer.getbyid)
 module.exports =router
