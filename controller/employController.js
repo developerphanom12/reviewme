@@ -201,7 +201,7 @@ console.log("userid and userrole", userId,userRole)
 const getbyid = async (req, res) => {
 
   try {
-    const { userId } = req.params;
+    const userId  = req.user.id;
 
     if (!userId) {
       return res.status(400).json({ error: 'employ id provide please.' });
