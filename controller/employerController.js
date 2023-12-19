@@ -25,7 +25,7 @@ const registeremployer = async (req, res) => {
       res.status(messages.EMPLOYER.EMPLOYER_CREATE.status).json({
         message: messages.EMPLOYER.EMPLOYER_CREATE.message,
         status: 201,
-        data: {id : userId},
+        data: userId,
       });
     } catch (error) {
       console.error(error);

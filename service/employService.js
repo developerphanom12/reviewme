@@ -14,7 +14,7 @@ function getEmployByName(email, phone_number) {
         resolve(results.length > 0 ? results[0] : null);
       }
     });
-  });
+  });  
 }
 
 function insertEmploy(email, password, phone_number, first_name, last_name, gender) {
