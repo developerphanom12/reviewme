@@ -123,10 +123,37 @@ const validateschema1 = (req, res, next) => {
   next();
 };
 
+
+
+const addcompanyprofiledetails = Joi.object({
+  company_name : Joi.string().required(),
+  company_website : Joi.string().required(),
+  tagline : Joi.string(),
+  description : Joi.string().required(),
+  sales_email : Joi.string().email().required(),
+  contact_phone : Joi.number().required(),
+  total_employe:Joi.number().required(),
+  founded_year : Joi.date().required(),
+  })
+
+
+const ValidateCOmpanyProfile = (req,res,next) =>{
+  const {error} = addcompanyprofiledetails.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({ error: error.details[0].message });
+  }
+
+  next();
+};
+
+
+
 module.exports = {
     validateEmployersdata,
     validateeducation,
     employcompanydetails,
     employSkilldetails,
-    validateschema1
+    validateschema1,
+    ValidateCOmpanyProfile
 }

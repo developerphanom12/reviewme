@@ -74,8 +74,51 @@ function employlogin(email, password, callback) {
     });
   }
   
+
+
+
+function addprofileData(profileData) {
+  return new Promise((resolve, reject) => {
+    const insertSql = `INSERT INTO companyprofile(employer_id, company_name, company_website, tagline, description, sales_email, contact_phone, total_employe, founded_year) 
+                           VALUES (?, ?,?,?,?,?,?,?,?)`;
+
+    const values = [
+      profileData.employer_id,
+      profileData.company_name,
+      profileData.company_website,
+      profileData.tagline,
+      profileData.description,
+      profileData.sales_email,
+      profileData.contact_phone,
+      profileData.total_employe,
+      profileData.founded_year,
+    ];
+
+    db.query(insertSql, values, (error, result) => {
+      if (error) {
+        console.error('Error add profile:', error);
+        reject(error);
+      } else {
+        const profileId = result.insertId;
+
+        if (profileId > 0) {
+          const successMessage = 'add profile successful';
+          resolve(successMessage);
+        } else {
+          const errorMessage = 'add profile failed';
+          reject(errorMessage);
+        }
+      }
+    });
+  });
+}
+
+
+
+
 module.exports = {
     getEmployerByName,
     insertEmployer,
-    employlogin
+    employlogin,
+    addprofileData
 };
