@@ -115,10 +115,42 @@ function addprofileData(profileData) {
 
 
 
+function employerAddress(employAddress) {
+  return new Promise((resolve, reject) => {
+    const insertSql = `INSERT INTO location( time_zone,phone_number,address,total_employee,employer_id) 
+                           VALUES (?, ?,?,?,?)`;
+
+    const values = [
+      employAddress.time_zone,
+      employAddress.phone_number,
+      employAddress.address,
+      employAddress.total_employee,
+      employAddress.employer_id
+    ];
+
+    db.query(insertSql, values, (error, result) => {
+      if (error) {
+        console.error("Error adding ticket:", error);
+        reject(error);
+      } else {
+        const addressId = result.insertId;
+
+        if (addressId > 0) {
+          const successMessage = "Address added successfully";
+          resolve(successMessage);
+        } else {
+          const errorMessage = "add address failed";
+          reject(errorMessage);
+        }
+      }
+    });
+  });
+}
 
 module.exports = {
     getEmployerByName,
     insertEmployer,
     employlogin,
-    addprofileData
+    addprofileData,
+    employerAddress
 };

@@ -126,25 +126,49 @@ const addprofiledata = async (req, res) => {
   }
 };
 
-const addAdress = async ()=>{
-const userId = req.user.id
-const {addtimezone,}=req.body
-try{
-  if (req.user.role !== "employer") {
-    throw {
-      status: 403,
-      error: "Forbidden. Only employer can see this.",
-    };
-  } 
+const addAddress = async (req, res) => {
 
-}catch{
+  const userId = req.user.id;
+  const userole = req.user.role;
+  console.log("userrrororor",userole,userId)
 
-}
+  console.log("useriddd",userId)
+  const { time_zone, phone_number, address, total_employee, employer_id } = req.body;
 
-}
+  try {
+    if (req.user.role !== "employer") {
+      throw {
+        status: 403,
+        error: "Forbidden. Only employer can see this.",
+      };
+    }
+    const addressData = await employerservice.employerAddress({
+      time_zone,
+      phone_number,
+      address,
+      total_employee,
+      employer_id: userId,
+    });
+
+    res.status(201).json({
+      message: addressData,
+      status: 201,
+    });
+  } catch (error) {
+    console.error("Error adding address:", error);
+
+    if (error.code === '404') {
+      res.status(400).json({ error: "Bad Request" });
+    } else {
+      res.status(error.status || 500).json({ error: error.message || "Internal Server Error" });
+    }
+  }
+};
+
+
 module.exports = {
   registeremployer,
   employlogin,
   addprofiledata,
-  addAdress
+  addAddress,
 };

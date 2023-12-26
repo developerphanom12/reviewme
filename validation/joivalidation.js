@@ -148,6 +148,25 @@ const ValidateCOmpanyProfile = (req,res,next) =>{
 };
 
 
+const addAddress= Joi.object({
+  time_zone : Joi.string().required(),
+  phone_number : Joi.number().required(),
+  address : Joi.string().required(),
+  total_employee : Joi.number().required(),
+  })
+
+
+const ValidateAssress = (req,res,next) =>{
+  const {error} = addAddress.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({ error: error.details[0].message });
+  }
+
+  next();
+};
+
+
 
 module.exports = {
     validateEmployersdata,
@@ -155,5 +174,6 @@ module.exports = {
     employcompanydetails,
     employSkilldetails,
     validateschema1,
-    ValidateCOmpanyProfile
+    ValidateCOmpanyProfile,
+    ValidateAssress
 }
