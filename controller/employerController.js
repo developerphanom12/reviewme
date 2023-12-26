@@ -133,7 +133,7 @@ const addAddress = async (req, res) => {
   console.log("userrrororor",userole,userId)
 
   console.log("useriddd",userId)
-  const { time_zone, phone_number, address, total_employee, employer_id } = req.body;
+  const { time_zone, phone_number, address, total_employee, employer_id,minimum_pojectsize,average_hourly } = req.body;
 
   try {
     if (req.user.role !== "employer") {
@@ -148,6 +148,8 @@ const addAddress = async (req, res) => {
       address,
       total_employee,
       employer_id: userId,
+      minimum_pojectsize,
+      average_hourly
     });
 
     res.status(201).json({

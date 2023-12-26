@@ -117,15 +117,17 @@ function addprofileData(profileData) {
 
 function employerAddress(employAddress) {
   return new Promise((resolve, reject) => {
-    const insertSql = `INSERT INTO location( time_zone,phone_number,address,total_employee,employer_id) 
-                           VALUES (?, ?,?,?,?)`;
+    const insertSql = `INSERT INTO location( time_zone,phone_number,address,total_employee,employer_id,minimum_pojectsize,average_hourly) 
+                           VALUES (?, ?,?,?,?,?,?)`;
 
     const values = [
       employAddress.time_zone,
       employAddress.phone_number,
       employAddress.address,
       employAddress.total_employee,
-      employAddress.employer_id
+      employAddress.employer_id,
+      employAddress.minimum_pojectsize,
+      employAddress.average_hourly
     ];
 
     db.query(insertSql, values, (error, result) => {

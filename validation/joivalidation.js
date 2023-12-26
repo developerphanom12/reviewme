@@ -153,6 +153,8 @@ const addAddress= Joi.object({
   phone_number : Joi.number().required(),
   address : Joi.string().required(),
   total_employee : Joi.number().required(),
+  minimum_pojectsize : Joi.number().required(),
+  average_hourly : Joi.number().required()
   })
 
 
