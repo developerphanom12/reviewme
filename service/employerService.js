@@ -149,10 +149,74 @@ function employerAddress(employAddress) {
   });
 }
 
+function getdataById(UserId) {
+  return new Promise((resolve, reject) => {
+    const query = `
+      SELECT
+          c.id,
+          c.company_name,
+          c.company_website,
+          c.tagline,
+          c.description,
+          c.sales_email,
+          c.contact_phone,
+          c.total_employe,
+          c.founded_year,
+          a.employer_id AS employer_id,
+          a.time_zone,
+          a.phone_number,
+          a.address,
+          a.total_employee,
+          a.minimum_pojectsize,
+          a.average_hourly
+          FROM companyprofile c
+      LEFT JOIN location a ON c.employer_id = a.employer_id
+      WHERE c.employer_id = ?;`;
+
+    db.query(query, UserId, (error, results) => {
+      if (error) {
+        console.error('Error executing query:', error);
+        reject(error);
+      } else {
+        if (results.length > 0) { 
+          const profile = {
+            id: results[0].id,
+            company_name: results[0].company_name,
+            company_website: results[0].company_website,
+            tagline: results[0].tagline,
+            description: results[0].description,
+            sales_email: results[0].sales_email,
+            contact_phone: results[0].contact_phone,
+            total_employe: results[0].total_employe,
+            founded_year: results[0].founded_year,
+            address: {
+              employer_id: results[0].employer_id,
+              time_zone: results[0].time_zone,
+              phone_number: results[0].phone_number,
+              address: results[0].address,
+              total_employee: results[0].total_employee,
+              minimum_pojectsize: results[0].minimum_pojectsize,
+              average_hourly: results[0].average_hourly
+            },
+          };
+
+          resolve(profile);
+
+          console.log('All data retrieved successfully');
+        } else {
+          resolve(null);
+          console.log('No data found for the given UserId');
+        }
+      }
+    });
+  });
+}
+
 module.exports = {
     getEmployerByName,
     insertEmployer,
     employlogin,
     addprofileData,
-    employerAddress
+    employerAddress,
+    getdataById
 };

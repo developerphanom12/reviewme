@@ -13,4 +13,6 @@ router.post('/addprofile',authenticateToken, ValidateCOmpanyProfile,employer.add
 
 router.post('/addAddress',ValidateAssress,authenticateToken,employer.addAddress)
 
+router.get('/getprofiledata',authenticateToken,employer.getprofiledata)
+
 module.exports =router 

@@ -127,13 +127,20 @@ const addprofiledata = async (req, res) => {
 };
 
 const addAddress = async (req, res) => {
-
   const userId = req.user.id;
   const userole = req.user.role;
-  console.log("userrrororor",userole,userId)
+  console.log("userrrororor", userole, userId);
 
-  console.log("useriddd",userId)
-  const { time_zone, phone_number, address, total_employee, employer_id,minimum_pojectsize,average_hourly } = req.body;
+  console.log("useriddd", userId);
+  const {
+    time_zone,
+    phone_number,
+    address,
+    total_employee,
+    employer_id,
+    minimum_pojectsize,
+    average_hourly,
+  } = req.body;
 
   try {
     if (req.user.role !== "employer") {
@@ -149,7 +156,7 @@ const addAddress = async (req, res) => {
       total_employee,
       employer_id: userId,
       minimum_pojectsize,
-      average_hourly
+      average_hourly,
     });
 
     res.status(201).json({
@@ -159,18 +166,67 @@ const addAddress = async (req, res) => {
   } catch (error) {
     console.error("Error adding address:", error);
 
-    if (error.code === '404') {
+    if (error.code === "404") {
       res.status(400).json({ error: "Bad Request" });
     } else {
-      res.status(error.status || 500).json({ error: error.message || "Internal Server Error" });
+      res
+        .status(error.status || 500)
+        .json({ error: error.message || "Internal Server Error" });
     }
   }
 };
 
+const getprofiledata = async (req, res) => {
+  try {
+    const UserId = req.user.id;
+    console.log("sdfsdfsdf", UserId);
 
+    if (!UserId) {
+      return res.status(400).json({
+        message: "please provide postid",
+        status: 400,
+      });
+    }
+
+    let profile;
+    profile = await employerservice.getdataById(UserId);
+    console.log(profile);
+
+    if (profile !== null) {
+      res.status(201).json({
+        message: "data fetched successfully",
+        status: 201,
+        data: profile,
+      });
+    } else {
+      const responseMessage = "No data found for the provided ID.";
+      res.status(404).json({
+        message: responseMessage,
+        status: 404,
+      });
+    }
+  } catch (error) {
+    if (error instanceof YourSpecificError) {
+      return res
+        .status(400)
+        .json({ error: "An error occurred while processing your request." });
+    }
+
+    if (error.name === "UnauthorizedError") {
+      return res.status(401).json({ error: "Unauthorized access" });
+    }
+
+    console.error("Internal Server Error:", error);
+
+    res
+      .status(500)
+      .json({ error: "An unexpected error occurred. Please try again later." });
+  }
+};
 module.exports = {
   registeremployer,
   employlogin,
   addprofiledata,
   addAddress,
+  getprofiledata,
 };
