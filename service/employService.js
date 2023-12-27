@@ -314,6 +314,84 @@ function getemployedetail(userId) {
 }
 
 
+function updateProfile(id, updatedProfileData) {
+  return new Promise((resolve, reject) => {
+      const { email, phone_number, first_name, last_name, gender, headline,school,degree,start_date,end_date,grade,title,employment_type,company_name,location,location_type,exprience,description} = updatedProfileData;
+
+      const updateQuery = `
+          UPDATE employe_register u
+          JOIN employe_education_table a ON u.id = a.employe_id
+          JOIN employe_company_details au ON u.id = au.employe_id
+          SET 
+              u.email = COALESCE(?, u.email),
+              u.phone_number = COALESCE(?, u.phone_number),
+              u.first_name = COALESCE(?, u.first_name),
+              u.last_name = COALESCE(?, u.last_name),
+              u.gender = COALESCE(?, u.gender),
+              u.headline = COALESCE(?, u.headline), 
+              a.school = COALESCE(?, a.school),
+              a.degree = COALESCE(?, a.degree),
+              a.start_date = COALESCE(?, a.start_date),
+              a.end_date = COALESCE(?, a.end_date),
+              a.grade = COALESCE(?, a.grade),
+              au.title = COALESCE(?,au.title),
+              au.employment_type = COALESCE(?,au.employment_type),
+              au.company_name = COALESCE(?,au.company_name),
+              au.location = COALESCE(?,au.location),
+              au.location_type = COALESCE(?,au.location_type),
+              au.exprience = COALESCE(?,au.exprience),
+              au.description = COALESCE(?,au.description)
+          WHERE u.id = ?;
+      `;
+
+      db.query(
+          updateQuery,
+          [
+              email,
+              phone_number,
+              first_name,
+              last_name,
+              gender,
+              headline,
+              school,
+              degree,
+              start_date,
+              end_date,
+              grade,
+              title,employment_type,company_name,location,location_type,exprience,description,
+              id
+          ],
+          (updateError, updateResult) => {
+              if (updateError) {
+                  reject(updateError);
+              } else {
+                  if (updateResult.affectedRows > 0) {
+                      const fetchQuery = `
+                          SELECT * FROM employe_register u
+                          JOIN employe_education_table a ON u.id = a.employe_id
+                         JOIN employe_company_details au ON u.id = au.employe_id                          WHERE u.id = ?;
+                      `;
+
+                      db.query(fetchQuery, [id], (fetchError, fetchResult) => {
+                          if (fetchError) {
+                              reject(fetchError);
+                          } else {
+                              if (fetchResult.length > 0) {
+                                  const updatedUserData = fetchResult[0];
+                                  resolve(updatedUserData);
+                              } else {
+                                  resolve(null);
+                              }
+                          }
+                      });
+                  } else {
+                      resolve(null);
+                  }
+              }
+          }
+      );
+  });
+}
 module.exports = {
   getEmployByName,
   insertEmploy,
@@ -321,5 +399,6 @@ module.exports = {
   updateeducation,
   updatecompanydetails,
   updateskillsdetails,
-  getemployedetail
+  getemployedetail,
+  updateProfile
 };

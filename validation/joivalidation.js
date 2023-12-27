@@ -169,6 +169,42 @@ const ValidateAssress = (req,res,next) =>{
 };
 
 
+const updateemployedata = Joi.object({
+  email: Joi.string().email().optional(),
+  phone_number: Joi.number().optional(),
+  first_name: Joi.string().optional(),
+  last_name : Joi.string().optional(),
+  gender : Joi.string().valid('male', 'female','other').optional(),
+  title : Joi.string().optional(),
+  employment_type : Joi.string().valid('fulltime','part_time','self_employe', 'freelance','internship', 'traineee').optional(),
+  company_name : Joi.string().optional(),
+  location : Joi.string().optional(),
+  location_type : Joi.string().valid('on_site','hybrid', 'remote').optional(),
+  exprience	: Joi.string().valid('yes', 'no').optional(),
+  start_date : Joi.date().optional(),
+  end_date : Joi.date().optional(),
+  description : Joi.string().optional(),
+  school : Joi.string().optional(),
+  degree  : Joi.string().optional(),
+  start_date : Joi.date().optional(),
+  end_date: Joi.date().optional(),
+  grade :Joi.string().optional(),
+  typeof_grade : Joi.string().valid('percentage', 'cgpa').optional()
+})
+
+
+const validUpdateEmploye = (req,res,next) =>{
+  const {error} = updateemployedata.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({ error: error.details[0].message });
+  }
+
+  next();
+};
+
+
+
 
 module.exports = {
     validateEmployersdata,
@@ -177,5 +213,6 @@ module.exports = {
     employSkilldetails,
     validateschema1,
     ValidateCOmpanyProfile,
-    ValidateAssress
+    ValidateAssress,
+    validUpdateEmploye
 }

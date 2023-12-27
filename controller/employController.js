@@ -224,11 +224,71 @@ const getbyid = async (req, res) => {
 };
 
 
+const updateProfile = async (req, res) => {
+  const userId = req.user.id;
+  const userRole = req.user.role;
+
+  try {
+     
+      if (userRole === 'employ') {
+        const { email, phone_number, first_name, last_name, gender, headline,school,degree,start_date,end_date,grade,
+                title,employment_type,company_name,location,location_type,exprience,description,} = req.body;
+
+          try {
+              const updatedData = await employerservice.updateProfile(userId, {
+                  email,
+                  phone_number,
+                  first_name,
+                  last_name,
+                  gender,
+                  headline,
+                  school,
+                  degree,
+                  start_date,
+                  end_date,
+                  grade,
+                  title,
+                  employment_type,
+                  company_name,
+                  location,
+                  location_type,
+                  exprience,
+                  description,
+                  
+                }).catch((error) => {
+                  return res.status(400).json({ error: error.message });
+              });
+
+              if (!updatedData) {
+                  const notFoundMessage = 'user not found';
+                  return res.status(404).json({ error: notFoundMessage.message });
+              }
+
+              const successMessage = "update succesfully";
+              res.status(200).json({
+                  message: successMessage,
+                 status: 200,
+                 data : updatedData
+              });
+          } catch (error) {
+              console.error(error);
+              return res.status(500).json({ status : 401 , error: 'Internal server error' });
+          }
+      }
+
+  } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+
 module.exports = {
     registeremploy,
     employlogin,
     updateemployeeducation,
     updatemployeCmpanydetails,
     updatemployeSKilldetails,
-    getbyid
+    getbyid,
+    updateProfile
 }
