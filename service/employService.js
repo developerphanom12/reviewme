@@ -1,41 +1,50 @@
-const db = require('../config/configration');
-const jwt = require('jsonwebtoken')
-const bcrypt = require('bcrypt')
-
-
+const db = require("../config/configration");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
 function getEmployByName(email, phone_number) {
   return new Promise((resolve, reject) => {
-    const query = 'SELECT * FROM employe_register WHERE email = ? AND phone_number = ?';
+    const query =
+      "SELECT * FROM employe_register WHERE email = ? AND phone_number = ?";
     db.query(query, [email, phone_number], (err, results) => {
       if (err) {
-        reject(`Error fetching employer by email or phone_number : ${err.message}`);
+        reject(
+          `Error fetching employer by email or phone_number : ${err.message}`
+        );
       } else {
         resolve(results.length > 0 ? results[0] : null);
-      }
-    });
-  });  
-}
-
-function insertEmploy(email, password, phone_number, first_name, last_name, gender) {
-  return new Promise((resolve, reject) => {
-    const query = 'INSERT INTO employe_register (email,password, phone_number,first_name,last_name,gender) VALUES (?, ?, ?,?,?,?)';
-    db.query(query, [email, password, phone_number, first_name, last_name, gender], (err, result) => {
-      if (err) {
-        reject(`Error inserting user: ${err.message}`);
-      } else {
-        resolve(result.insertId);
       }
     });
   });
 }
 
-
-
+function insertEmploy(
+  email,
+  password,
+  phone_number,
+  first_name,
+  last_name,
+  gender
+) {
+  return new Promise((resolve, reject) => {
+    const query =
+      "INSERT INTO employe_register (email,password, phone_number,first_name,last_name,gender) VALUES (?, ?, ?,?,?,?)";
+    db.query(
+      query,
+      [email, password, phone_number, first_name, last_name, gender],
+      (err, result) => {
+        if (err) {
+          reject(`Error inserting user: ${err.message}`);
+        } else {
+          resolve(result.insertId);
+        }
+      }
+    );
+  });
+}
 
 function employlogin(email, password, callback) {
-
-  const query = 'SELECT * FROM employe_register WHERE email = ?';
+  const query = "SELECT * FROM employe_register WHERE email = ?";
 
   db.query(query, [email], async (err, results) => {
     if (err) {
@@ -43,45 +52,51 @@ function employlogin(email, password, callback) {
     }
 
     if (results.length === 0) {
-      return callback(null, { error: 'employer not found' });
+      return callback(null, { error: "employer not found" });
     }
 
     const user = results[0];
 
     if (user.is_deleted === 1) {
-      return callback(null, { error: 'employer not found' });
+      return callback(null, { error: "employer not found" });
     }
 
     const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
-      return callback(null, { error: 'Invalid password' });
+      return callback(null, { error: "Invalid password" });
     }
 
-    const secretKey = 'secretkey';
-    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, secretKey);
+    const secretKey = "secretkey";
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role: user.role },
+      secretKey
+    );
 
     return callback(null, {
       data: {
-        user:{
-
+        user: {
           id: user.id,
           email: user.email,
           role: user.role,
           token: token,
-        }
-
-      }
+        },
+      },
     });
   });
 }
 
-
-
-
 function updateeducation(userId, updatemploye) {
   return new Promise((resolve, reject) => {
-    const { employe_id, school, degree, start_date, end_date, grade, typeof_grade } = updatemploye;
+    const {
+      employe_id,
+      school,
+      degree,
+      start_date,
+      end_date,
+      grade,
+      typeof_grade,
+    } = updatemploye;
 
     const query = `
         INSERT INTO  employe_education_table (employe_id,
@@ -93,44 +108,56 @@ function updateeducation(userId, updatemploye) {
            ) VALUES (?,?, ?, ?,?,?,?)
       `;
 
-
-    db.query(query, [userId, school, degree, start_date, end_date, grade, typeof_grade], (error, result) => {
-      if (error) {
-        reject(error);
-        console.log('Error updating employeee:', error);
-      } else {
-        if (result.affectedRows > 0) {
-
-          const fetchQuery = `
+    db.query(
+      query,
+      [userId, school, degree, start_date, end_date, grade, typeof_grade],
+      (error, result) => {
+        if (error) {
+          reject(error);
+          console.log("Error updating employeee:", error);
+        } else {
+          if (result.affectedRows > 0) {
+            const fetchQuery = `
               SELECT * FROM employe_education_table WHERE education_id = ?;
             `;
 
-          db.query(fetchQuery, [userId], (fetchError, fetchResult) => {
-            if (fetchError) {
-              reject(fetchError);
-              logger.error('Error fetching updated employeee:', fetchError);
-            } else {
-              if (fetchResult.length > 0) {
-                const updatyemployee = fetchResult[0];
-                resolve(updatyemployee);
-                console.log('employeee updated successfully', updatyemployee);
+            db.query(fetchQuery, [userId], (fetchError, fetchResult) => {
+              if (fetchError) {
+                reject(fetchError);
+                logger.error("Error fetching updated employeee:", fetchError);
               } else {
-                resolve(null);
+                if (fetchResult.length > 0) {
+                  const updatyemployee = fetchResult[0];
+                  resolve(updatyemployee);
+                  console.log("employeee updated successfully", updatyemployee);
+                } else {
+                  resolve(null);
+                }
               }
-            }
-          });
-        } else {
-          resolve(null);
+            });
+          } else {
+            resolve(null);
+          }
         }
       }
-    });
+    );
   });
 }
 
-
 function updatecompanydetails(userId, updatemploye) {
   return new Promise((resolve, reject) => {
-    const { employe_id, title, employment_type, company_name, location, location_type, exprience, start_date, end_date, description } = updatemploye;
+    const {
+      employe_id,
+      title,
+      employment_type,
+      company_name,
+      location,
+      location_type,
+      exprience,
+      start_date,
+      end_date,
+      description,
+    } = updatemploye;
 
     const query = `
         INSERT INTO  employe_company_details (employe_id,
@@ -145,37 +172,50 @@ function updatecompanydetails(userId, updatemploye) {
            ) VALUES (?,?, ?, ?,?,?,?,?,?,?)
       `;
 
-
-    db.query(query, [userId, title, employment_type, company_name, location, location_type, exprience, start_date, end_date, description], (error, result) => {
-      if (error) {
-        reject(error);
-        console.log('Error updating employeee:', error);
-      } else {
-        if (result.affectedRows > 0) {
-
-          const fetchQuery = `
+    db.query(
+      query,
+      [
+        userId,
+        title,
+        employment_type,
+        company_name,
+        location,
+        location_type,
+        exprience,
+        start_date,
+        end_date,
+        description,
+      ],
+      (error, result) => {
+        if (error) {
+          reject(error);
+          console.log("Error updating employeee:", error);
+        } else {
+          if (result.affectedRows > 0) {
+            const fetchQuery = `
               SELECT * FROM employe_company_details WHERE employe_id = ?;
             `;
 
-          db.query(fetchQuery, [userId], (fetchError, fetchResult) => {
-            if (fetchError) {
-              reject(fetchError);
-              logger.error('Error fetching updated employeee:', fetchError);
-            } else {
-              if (fetchResult.length > 0) {
-                const updatyemployee = fetchResult[0];
-                resolve(updatyemployee);
-                console.log('employeee updated successfully', updatyemployee);
+            db.query(fetchQuery, [userId], (fetchError, fetchResult) => {
+              if (fetchError) {
+                reject(fetchError);
+                logger.error("Error fetching updated employeee:", fetchError);
               } else {
-                resolve(null);
+                if (fetchResult.length > 0) {
+                  const updatyemployee = fetchResult[0];
+                  resolve(updatyemployee);
+                  console.log("employeee updated successfully", updatyemployee);
+                } else {
+                  resolve(null);
+                }
               }
-            }
-          });
-        } else {
-          resolve(null);
+            });
+          } else {
+            resolve(null);
+          }
         }
       }
-    });
+    );
   });
 }
 
@@ -185,7 +225,7 @@ function updateskillsdetails(userId, updatemploye) {
 
     const query = `
     INSERT INTO employe_skills_details (employe_id, skills)
-    VALUES ${skills.map(skill => '(?, ?)').join(', ')}
+    VALUES ${skills.map((skill) => "(?, ?)").join(", ")}
 `;
 
     const queryParams = skills.reduce((params, skill) => {
@@ -196,10 +236,9 @@ function updateskillsdetails(userId, updatemploye) {
     db.query(query, queryParams, (error, result) => {
       if (error) {
         reject(error);
-        console.log('Error updating employee:', error);
+        console.log("Error updating employee:", error);
       } else {
         if (result.affectedRows > 0) {
-
           const fetchQuery = `
               SELECT * FROM employe_skills_details WHERE employe_id = ?;
             `;
@@ -207,12 +246,12 @@ function updateskillsdetails(userId, updatemploye) {
           db.query(fetchQuery, [userId], (fetchError, fetchResult) => {
             if (fetchError) {
               reject(fetchError);
-              logger.error('Error fetching updated employeee:', fetchError);
+              logger.error("Error fetching updated employeee:", fetchError);
             } else {
               if (fetchResult.length > 0) {
                 const updatyemployee = fetchResult[0];
                 resolve(updatyemployee);
-                console.log('employeee updated successfully', updatyemployee);
+                console.log("employeee updated successfully", updatyemployee);
               } else {
                 resolve(null);
               }
@@ -226,11 +265,9 @@ function updateskillsdetails(userId, updatemploye) {
   });
 }
 
-
-
 function getemployedetail(userId) {
   return new Promise((resolve, reject) => {
-      const query = `
+    const query = `
       SELECT 
           c.id,
           c.first_name,
@@ -260,65 +297,80 @@ function getemployedetail(userId) {
       LEFT JOIN employe_education_table a ON c.id = a.employe_id
       WHERE c.id = ?;`;
 
-      db.query(query, [userId], (error, results) => {
-          if (error) {
-              console.error('Error executing query:', error);
-              reject(error);
-              console.error('Error getting employe by ID:', error);
-          } else {
-              if (results.length === 0) {
-                  reject(new Error('employe not found'));
-              } else {
-                  const employe = {};
-                  results.forEach((row) => {
-                      if (!employe[row.id]) {
-                        employe[row.id] = {
-                              id: row.id,
-                              first_name: row.first_name,
-                              last_name: row.last_name,
-                              phone_number: row.phone_number,
-                              email: row.email,
-                              gender: row.gender,
-                              company: {
-                                  company_id: row.company_id,
-                                  employment_type: row.employment_type,
-                                  location: row.location,
-                                  location_type: row.location_type,
-                                  exprience: row.exprience,
-                                  start_date : row.start_date,
-                                  end_date: row.end_date,
-                                  description : row.description
-                              },
-                              education : {
-                                education_id: row.education_id,
-                                school : row.school,
-                                degree : row.degree,
-                                start_date : row.start_date,
-                                end_date : row.end_date,
-                                grade : row.grade,
-                                typeof_grade : row.typeof_grade
-                              }
-            
-                          };
-                      }
+    db.query(query, [userId], (error, results) => {
+      if (error) {
+        console.error("Error executing query:", error);
+        reject(error);
+        console.error("Error getting employe by ID:", error);
+      } else {
+        if (results.length === 0) {
+          reject(new Error("employe not found"));
+        } else {
+          const employe = {};
+          results.forEach((row) => {
+            if (!employe[row.id]) {
+              employe[row.id] = {
+                id: row.id,
+                first_name: row.first_name,
+                last_name: row.last_name,
+                phone_number: row.phone_number,
+                email: row.email,
+                gender: row.gender,
+                company: {
+                  company_id: row.company_id,
+                  employment_type: row.employment_type,
+                  location: row.location,
+                  location_type: row.location_type,
+                  exprience: row.exprience,
+                  start_date: row.start_date,
+                  end_date: row.end_date,
+                  description: row.description,
+                },
+                education: {
+                  education_id: row.education_id,
+                  school: row.school,
+                  degree: row.degree,
+                  start_date: row.start_date,
+                  end_date: row.end_date,
+                  grade: row.grade,
+                  typeof_grade: row.typeof_grade,
+                },
+              };
+            }
+          });
 
-                     
-                  });
-
-                  resolve(Object.values(employe));
-                  console.log('employe retrieved by ID successfully');
-              }
-          }
-      });
+          resolve(Object.values(employe));
+          console.log("employe retrieved by ID successfully");
+        }
+      }
+    });
   });
 }
 
-
 function updateProfile(id, updatedProfileData) {
   return new Promise((resolve, reject) => {
-      const { email, phone_number, first_name, last_name, gender, headline,school,degree,start_date,end_date,grade,title,employment_type,company_name,location,location_type,exprience,description} = updatedProfileData;
+    const {
+      email,
+      phone_number,
+      first_name,
+      last_name,
+      gender,
+      headline,
+      school,
+      degree,
+      start_date,
+      end_date,
+      grade,
+      title,
+      employment_type,
+      company_name,
+      location,
+      location_type,
+      exprience,
+      description,
+    } = updatedProfileData;
 
-      const updateQuery = `
+    const updateQuery = `
           UPDATE employe_register u
           JOIN employe_education_table a ON u.id = a.employe_id
           JOIN employe_company_details au ON u.id = au.employe_id
@@ -343,53 +395,61 @@ function updateProfile(id, updatedProfileData) {
               au.description = COALESCE(?,au.description)
           WHERE u.id = ?;
       `;
+    const values = [
+      email,
+      phone_number,
+      first_name,
+      last_name,
+      gender,
+      headline,
+      school,
+      degree,
+      start_date,
+      end_date,
+      grade,
+      title,
+      employment_type,
+      company_name,
+      location,
+      location_type,
+      exprience,
+      description,
+      id,
+    ];
 
-      db.query(
-          updateQuery,
-          [
-              email,
-              phone_number,
-              first_name,
-              last_name,
-              gender,
-              headline,
-              school,
-              degree,
-              start_date,
-              end_date,
-              grade,
-              title,employment_type,company_name,location,location_type,exprience,description,
-              id
-          ],
-          (updateError, updateResult) => {
-              if (updateError) {
-                  reject(updateError);
-              } else {
-                  if (updateResult.affectedRows > 0) {
-                      const fetchQuery = `
+    db.query(
+      updateQuery,
+      values,
+
+      (updateError, updateResult) => {
+        if (updateError) {
+          reject(updateError);
+        } else {
+          if (updateResult.affectedRows > 0) {
+            const fetchQuery = `
                           SELECT * FROM employe_register u
                           JOIN employe_education_table a ON u.id = a.employe_id
                          JOIN employe_company_details au ON u.id = au.employe_id                          WHERE u.id = ?;
                       `;
 
-                      db.query(fetchQuery, [id], (fetchError, fetchResult) => {
-                          if (fetchError) {
-                              reject(fetchError);
-                          } else {
-                              if (fetchResult.length > 0) {
-                                  const updatedUserData = fetchResult[0];
-                                  resolve(updatedUserData);
-                              } else {
-                                  resolve(null);
-                              }
-                          }
-                      });
-                  } else {
-                      resolve(null);
-                  }
+            db.query(fetchQuery, [id], (fetchError, fetchResult) => {
+              if (fetchError) {
+                reject(fetchError);
+              } else {
+                if (fetchResult.length > 0) {
+                  const updatedUserData = fetchResult[0];
+                  resolve(updatedUserData);
+                } else {
+                  resolve(null);
+                }
               }
+            });
+          } else {
+            resolve(null);
           }
-      );
+        }
+      }
+    );
   });
 }
 module.exports = {
@@ -400,5 +460,5 @@ module.exports = {
   updatecompanydetails,
   updateskillsdetails,
   getemployedetail,
-  updateProfile
+  updateProfile,
 };
