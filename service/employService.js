@@ -509,6 +509,58 @@ function getcomment(userId) {
     });
   });
 }
+
+
+
+
+function Replycomment(ReplyId) {
+  return new Promise((resolve, reject) => {
+    const insertSql = `INSERT INTO comment_reply(reply_comment,comment_id,user_id,role) 
+                           VALUES (?,?,?,?)`;
+
+    const values = [
+      ReplyId.reply_comment,
+      ReplyId.comment_id,
+      ReplyId.user_id,
+      ReplyId.role
+    ];
+
+    db.query(insertSql, values, (error, result) => {
+      if (error) {
+        console.error('Error reply comment:', error);
+        reject(error);
+      } else {
+        const replyId = result.insertId;
+
+        if (replyId > 0) {
+          const successMessage = 'add reply comment successful';
+          resolve(successMessage);
+        } else {
+          const errorMessage = 'add  reply comment failed';
+          reject(errorMessage);
+        }
+      }
+    });
+  });
+}
+
+
+
+const checkCommentId = (comment_id) => {
+  return new Promise((resolve, reject) => {
+    const checkUserSql = 'SELECT * FROM review_employe WHERE id = ?';
+
+    db.query(checkUserSql, [comment_id], (error, result) => {
+      if (error) {
+        console.error('Error checking user existence:', error);
+        reject(error);
+      } else {
+
+        resolve(result.length > 0);
+      }
+    });
+  });
+};
 module.exports = {
   getEmployByName,
   insertEmploy,
@@ -518,5 +570,7 @@ module.exports = {
   updateskillsdetails,
   getemployedetail,
   updateProfile,
-  getcomment
+  getcomment,
+  Replycomment,
+  checkCommentId
 };

@@ -225,6 +225,23 @@ const ValidateReview = (req,res,next) =>{
 };
 
 
+const addReplycomment = Joi.object({
+  comment_id:Joi.number().required(),
+  reply_comment : Joi.string().required(),
+ 
+  })
+
+
+const ValidateReplyComment = (req,res,next) =>{
+  const {error} = addReplycomment.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({ error: error.details[0].message });
+  }
+
+  next();
+};
+
 module.exports = {
     validateEmployersdata,
     validateeducation,
@@ -234,5 +251,6 @@ module.exports = {
     ValidateCOmpanyProfile,
     ValidateAssress,
     validUpdateEmploye,
-    ValidateReview
+    ValidateReview,
+    ValidateReplyComment
 }

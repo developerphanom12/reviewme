@@ -1,9 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const employer = require('../controller/employController');
-const { validateEmployersdata, validateeducation, employcompanydetails, employSkilldetails, validUpdateEmploye } = require("../validation/joivalidation");
+const { validateEmployersdata, validateeducation, employcompanydetails, employSkilldetails, validUpdateEmploye, ValidateReplyComment } = require("../validation/joivalidation");
 const authenticateToken = require("../authentication/token");
-const { route } = require("./employer");
 
 
 router.post('/register',validateEmployersdata,employer.registeremploy);
@@ -21,5 +20,10 @@ router.get('/getdetailprofile/', authenticateToken, employer.getbyid)
 router.put('/updateProfile',validUpdateEmploye, authenticateToken, employer.updateProfile)
 
 router.get('/getcomment', authenticateToken , employer.getcommentbyID)
+
+router.post('/replycomment', authenticateToken , ValidateReplyComment,employer.replycomment)
+
+// router.get('/getcomment/:id', authenticateToken, employer.getcommentbyID)
+
 
 module.exports =router
