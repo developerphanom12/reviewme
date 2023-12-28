@@ -452,6 +452,63 @@ function updateProfile(id, updatedProfileData) {
     );
   });
 }
+
+
+
+function getcomment(userId) {
+  return new Promise((resolve, reject) => {
+    const query = `
+      SELECT 
+          c.id as comment_id,
+          c.rating,
+          c.employe_type,
+          c.performance,
+          c.attachment_file,
+          c.company_id,
+          c.employ_id,
+          a.id,
+          a.first_name,
+          au.company_name,
+          au.employer_id
+      FROM review_employe c
+      LEFT JOIN employe_register a ON c.employ_id = a.id
+      LEFT JOIN companyprofile au ON c.company_id = au.employer_id
+      WHERE c.employ_id = ?;`;
+
+    db.query(query, [userId], (error, results) => {
+      if (error) {
+        console.error("Error executing query:", error);
+        reject(error);
+        console.error("Error getting employe by ID:", error);
+      } else {
+        if (results.length === 0) {
+          reject(new Error("employe not found"));
+        } else {
+          const employe = {};
+          results.forEach((row) => {
+            if (!employe[row.id]) {
+              employe[row.id] = {
+                comment_id: row.comment_id,
+                first_name:row.first_name,
+                rating: row.rating,
+                employe_type: row.employe_type,
+                performance: row.performance,
+                attachment_file: row.attachment_file,
+                company: {
+                  employer_id: row.employer_id,
+                  company_name: row.company_name
+                },
+              };
+            }
+          });
+
+          resolve(Object.values(employe));
+          console.log("employe retrieved by ID successfully");
+        }
+      }
+    });
+  });
+}
 module.exports = {
   getEmployByName,
   insertEmploy,
@@ -461,4 +518,5 @@ module.exports = {
   updateskillsdetails,
   getemployedetail,
   updateProfile,
+  getcomment
 };

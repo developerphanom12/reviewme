@@ -206,6 +206,25 @@ const validUpdateEmploye = (req,res,next) =>{
 
 
 
+const addReviewe = Joi.object({
+  rating : Joi.number().required(),
+  employe_type : Joi.string().valid('Youremploye','Freelancer','Influencer').required(),
+  performance : Joi.string().valid('Bad','Good','Average', 'Excellent', 'Blacklisted').required(),
+  employ_id : Joi.number().required()
+  })
+
+
+const ValidateReview = (req,res,next) =>{
+  const {error} = addReviewe.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({ error: error.details[0].message });
+  }
+
+  next();
+};
+
+
 module.exports = {
     validateEmployersdata,
     validateeducation,
@@ -214,5 +233,6 @@ module.exports = {
     validateschema1,
     ValidateCOmpanyProfile,
     ValidateAssress,
-    validUpdateEmploye
+    validUpdateEmploye,
+    ValidateReview
 }

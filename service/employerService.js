@@ -212,11 +212,48 @@ function getdataById(UserId) {
   });
 }
 
+
+
+function addReview(ReviewData) {
+  return new Promise((resolve, reject) => {
+    const insertSql = `INSERT INTO review_employe( rating, employe_type, performance,attachment_file,company_id, employ_id) 
+                           VALUES (?, ?,?,?,?,?)`;
+
+    const values = [
+      ReviewData.rating,
+      ReviewData.employe_type,
+      ReviewData.performance,
+      ReviewData.attachment_file,
+      ReviewData.company_id,
+      ReviewData.employ_id
+    ];
+
+    db.query(insertSql, values, (error, result) => {
+      if (error) {
+        console.error("Error adding review:", error);
+        reject(error);
+      } else {
+        const idComment = result.insertId;
+
+        if (idComment > 0) {
+          const successMessage = "add review successful";
+          resolve(successMessage);
+        } else {
+          const errorMessage = "add review failed";
+          reject(errorMessage);
+        }
+      }
+    });
+  });
+}
+
+
 module.exports = {
     getEmployerByName,
     insertEmployer,
     employlogin,
     addprofileData,
     employerAddress,
-    getdataById
+    getdataById,
+    addReview
 };

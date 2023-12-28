@@ -223,10 +223,58 @@ const getprofiledata = async (req, res) => {
       .json({ error: "An unexpected error occurred. Please try again later." });
   }
 };
+
+
+const reviewAdd = async (req, res) => {
+  try {
+  
+    const userId = req.user.id;
+    const { rating, employe_type, performance, employ_id } = req.body;
+
+    if (!req.file) {
+      return res.status(400).json({
+        status:400,
+        error: 'attachment_file  file is required.',
+      });
+    }
+    const imagePath = req.file.filename;
+
+    const dataCommnet = await employerservice.addReview({
+      company_id: userId,
+      attachment_file: imagePath,
+      rating,
+      employe_type,
+      performance,
+      employ_id
+    });
+
+    res.status(201).json({
+      message: dataCommnet,
+      status: 201,
+    });
+  } catch (error) {
+    if (error instanceof YourSpecificError) {
+      return res.status(400).json({ error: 'An error occurred while processing your request.' });
+    }
+
+    if (error.name === 'UnauthorizedError') {
+      return res.status(401).json({ error: 'Unauthorized access' });
+    }
+
+    console.error('Internal Server Error:', error);
+
+    res.status(500).json({ error: 'An unexpected error occurred. Please try again later.' });
+  }
+};
+
+
+
+
 module.exports = {
   registeremployer,
   employlogin,
   addprofiledata,
   addAddress,
   getprofiledata,
+  reviewAdd
 };
