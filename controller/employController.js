@@ -408,6 +408,84 @@ const replycomment = async (req, res) => {
   }
 };
 
+const getcommentReply = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    console.log("sdfsdfsdf", userId);
+
+    if (!userId) {
+      return res.status(400).json({
+        message: "please provide userId",
+        status: 400,
+      });
+    }
+    let comments;
+    comments = await employerservice.getcomment(userId);
+
+    if (comments.length > 0) {
+      res.status(201).json({
+        message: "Comment fetched successfully",
+        status: 201,
+        data: comments,
+      });
+    } else {
+      const responseMessage = "No datafound for the provided ID.";
+      res.status(404).json({
+        message: responseMessage,
+        status: 404,
+      });
+    }
+  } catch (error) {
+    if (error instanceof YourSpecificError) {
+      return res.status(400).json({
+        status: 400,
+        error: "An error occurred while processing your request.",
+      });
+    }
+
+    if (error.name === "UnauthorizedError") {
+      return res.status(401).json({
+        status: 401,
+        error: "Unauthorized access",
+      });
+    }
+
+    console.error("Internal Server Error:", error);
+
+    res.status(500).json({
+      status: 500,
+      error: "An unexpected error occurred. Please try again later.",
+    });
+  }
+};
+
+
+const getbyidcmnt = async (req, res) => {
+
+  try {
+    const { commentId } = req.params;
+
+    if (!commentId) {
+      return res.status(400).json({ error: 'comment id provide please.' });
+    }
+    const userApplications = await employerservice.getbyid(commentId);
+
+    if (userApplications.length === 0) {
+      return res.status(404).json({ status: 404, message: 'Application not found' });
+    }
+
+    res.status(201).json({
+      message: `data feth succesffully with comment id ${commentId}`,
+      status: 201,
+      data: userApplications,
+    });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+
 module.exports = {
   registeremploy,
   employlogin,
@@ -418,4 +496,6 @@ module.exports = {
   updateProfile,
   getcommentbyID,
   replycomment,
+  getcommentReply,
+  getbyidcmnt
 };

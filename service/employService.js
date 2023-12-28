@@ -453,8 +453,6 @@ function updateProfile(id, updatedProfileData) {
   });
 }
 
-
-
 function getcomment(userId) {
   return new Promise((resolve, reject) => {
     const query = `
@@ -489,14 +487,14 @@ function getcomment(userId) {
             if (!employe[row.id]) {
               employe[row.id] = {
                 comment_id: row.comment_id,
-                first_name:row.first_name,
+                first_name: row.first_name,
                 rating: row.rating,
                 employe_type: row.employe_type,
                 performance: row.performance,
                 attachment_file: row.attachment_file,
                 company: {
                   employer_id: row.employer_id,
-                  company_name: row.company_name
+                  company_name: row.company_name,
                 },
               };
             }
@@ -510,9 +508,6 @@ function getcomment(userId) {
   });
 }
 
-
-
-
 function Replycomment(ReplyId) {
   return new Promise((resolve, reject) => {
     const insertSql = `INSERT INTO comment_reply(reply_comment,comment_id,user_id,role) 
@@ -522,21 +517,21 @@ function Replycomment(ReplyId) {
       ReplyId.reply_comment,
       ReplyId.comment_id,
       ReplyId.user_id,
-      ReplyId.role
+      ReplyId.role,
     ];
 
     db.query(insertSql, values, (error, result) => {
       if (error) {
-        console.error('Error reply comment:', error);
+        console.error("Error reply comment:", error);
         reject(error);
       } else {
         const replyId = result.insertId;
 
         if (replyId > 0) {
-          const successMessage = 'add reply comment successful';
+          const successMessage = "add reply comment successful";
           resolve(successMessage);
         } else {
-          const errorMessage = 'add  reply comment failed';
+          const errorMessage = "add  reply comment failed";
           reject(errorMessage);
         }
       }
@@ -544,23 +539,126 @@ function Replycomment(ReplyId) {
   });
 }
 
-
-
 const checkCommentId = (comment_id) => {
   return new Promise((resolve, reject) => {
-    const checkUserSql = 'SELECT * FROM review_employe WHERE id = ?';
+    const checkUserSql = "SELECT * FROM review_employe WHERE id = ?";
 
     db.query(checkUserSql, [comment_id], (error, result) => {
       if (error) {
-        console.error('Error checking user existence:', error);
+        console.error("Error checking user existence:", error);
         reject(error);
       } else {
-
         resolve(result.length > 0);
       }
     });
   });
 };
+
+function getcommentReply(userId) {
+  return new Promise((resolve, reject) => {
+    const query = `
+      SELECT 
+          c.id as comment_id,
+          c.rating,
+          c.employe_type,
+          c.performance,
+          c.attachment_file,
+          c.company_id,
+          c.employ_id,
+          a.id,
+          a.first_name,
+          au.company_name,
+          au.employer_id
+      FROM review_employe c
+      LEFT JOIN employe_register a ON c.employ_id = a.id
+      LEFT JOIN companyprofile au ON c.company_id = au.employer_id
+      WHERE c.employ_id = ?;`;
+
+    db.query(query, [userId], (error, results) => {
+      if (error) {
+        console.error("Error executing query:", error);
+        reject(error);
+        console.error("Error getting employe by ID:", error);
+      } else {
+        if (results.length === 0) {
+          reject(new Error("employe not found"));
+        } else {
+          const employe = {};
+          results.forEach((row) => {
+            if (!employe[row.id]) {
+              employe[row.id] = {
+                comment_id: row.comment_id,
+                first_name: row.first_name,
+                rating: row.rating,
+                employe_type: row.employe_type,
+                performance: row.performance,
+                attachment_file: row.attachment_file,
+                company: {
+                  employer_id: row.employer_id,
+                  company_name: row.company_name,
+                },
+              };
+            }
+          });
+
+          resolve(Object.values(employe));
+          console.log("employe retrieved by ID successfully");
+        }
+      }
+    });
+  });
+}
+async function getbyid(commentId) {
+  const query = `
+      SELECT
+      a.id,
+      a.comment_id,
+      a.reply_comment,
+      a.create_date AS date,
+      a.update_date,
+      a.role,
+      CASE
+          WHEN a.role = 'employ' THEN u.id
+          WHEN a.role = 'employer' THEN s.employer_id
+      END AS user_id,
+      CASE
+          WHEN a.role = 'employ' THEN u.first_name
+          WHEN a.role = 'employer' THEN s.company_name
+      END AS user_username
+      FROM comment_reply a
+      LEFT JOIN employe_register u ON a.user_id = u.id AND a.role = 'employ'
+      LEFT JOIN companyprofile s ON a.user_id = s.employer_id AND a.role = 'employer' 
+      WHERE a.comment_id = ?`;
+
+  const params = [commentId];
+
+  return new Promise((resolve, reject) => {
+      db.query(query, params, (error, results) => {
+          if (error) {
+              reject(error);
+          } else {
+              const comments = [];
+
+              results.forEach((row) => {
+                  if (row.comment_id !== null && row.reply_comment !== null) {
+                      const comment = {
+                          comment_id: row.comment_id,
+                          reply_comment: row.reply_comment,
+                          role: row.role,
+                          id: row.user_id,
+                          name: row.user_username,
+                          date: row.date
+                      };
+                      comments.push(comment);
+                  }
+              });
+
+              resolve(comments);
+          }
+      });
+  });
+}
+
 module.exports = {
   getEmployByName,
   insertEmploy,
@@ -572,5 +670,7 @@ module.exports = {
   updateProfile,
   getcomment,
   Replycomment,
-  checkCommentId
+  checkCommentId,
+  getcommentReply,
+  getbyid
 };

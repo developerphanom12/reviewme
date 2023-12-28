@@ -23,7 +23,7 @@ router.get('/getcomment', authenticateToken , employer.getcommentbyID)
 
 router.post('/replycomment', authenticateToken , ValidateReplyComment,employer.replycomment)
 
-// router.get('/getcomment/:id', authenticateToken, employer.getcommentbyID)
+router.get('/getcomment/:commentId', authenticateToken, employer.getbyidcmnt)
 
 
 module.exports =router
